@@ -1,0 +1,394 @@
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Scanner;
+
+public class FINALPROJEKKKK {
+    
+    // Method untuk menu kasir
+    static void menuKasir(String[] namaMenu, int[] hargaMenu, int[] jumlahTerjual, double[] totalPemasukan) {
+        Scanner scanner = new Scanner(System.in);
+        int[] jumlahItem = new int[namaMenu.length];
+        System.out.print("Masukkan PIN Kasir: ");
+        String pinKasir = scanner.nextLine();
+        if (validasiPINKasir(pinKasir)) {
+            // Panggil menu kasir di sini
+        } else {
+            System.out.println("PIN salah. Akses ditolak.");
+        }
+        while (true) {
+            System.out.println("== Menu Kasir ==");
+            System.out.println("1. Tampilkan Menu");
+            System.out.println("2. Transaksi");
+            System.out.println("0. Kembali ke menu utama");
+            System.out.print("Pilih: ");
+            int pilih = scanner.nextInt();
+
+            switch (pilih) {
+                case 1:
+                    tampilkanMenu(namaMenu, hargaMenu);
+                    break;
+                case 2:
+                    tampilkanMenu(namaMenu, hargaMenu);
+                
+                    
+                    while(true){
+                        System.out.print("Masukkan nomor menu yang ingin dibeli (1-"+namaMenu.length+") atau 0 untuk selesai:");
+                        int nomorMenu=scanner.nextInt();
+                        if (nomorMenu==0) {
+                            break;
+                        }else if(nomorMenu>= 1&&nomorMenu<=namaMenu.length){
+                            System.out.print("Masukkan jumlah untuk "+ namaMenu[nomorMenu-1]+":");
+                            int jumlah=scanner.nextInt();
+                            jumlahItem[nomorMenu-1]+=jumlah;
+                        }else{
+                            System.out.println("Nomor menu tidak valid");
+                        }
+                    }
+                    //menampilkan keranjang pesanan     
+                    tampilkanKeranjang(namaMenu, hargaMenu, jumlahItem);
+                    //menghitung total harga
+                    int totalHarga=hitungTotalHarga(hargaMenu, jumlahItem);
+                    //memproses pembayaran
+                    pembayaran(totalHarga, jumlahTerjual, hargaMenu, totalPemasukan);
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+            }
+        }
+    }
+    
+    //method menampilakn menu
+    static void tampilkanMenu(String[] namaMenu, int[] hargaMenu){
+       
+        System.out.println("====================================================");
+        System.out.println("                   Daftar Menu                      ");
+        System.out.println("====================================================");
+        System.out.printf("%-5s %-20s %-10s%n", "No", "Nama Menu", "Harga");
+        System.out.println("====================================================");
+        for (int i = 0; i < namaMenu.length; i++) {
+            System.out.printf("%-5d %-20s Rp %-10d%n",(i+1),namaMenu[i],hargaMenu[i]);   
+        }
+        System.out.println("====================================================");
+    }
+    
+    //Method untuk mneghitung total harga
+    static int hitungTotalHarga(int[] hargaMenu, int[] jumlahItem){
+        int totalHarga=0;
+        for (int i = 0; i < jumlahItem.length; i++) {
+            totalHarga+=hargaMenu[i]*jumlahItem[i];
+            
+        }
+        return totalHarga;
+    }
+    
+    //method untuk menampilkan keranjang
+    static void tampilkanKeranjang(String[]namaMenu,int[]hargaMenu, int[]jumlahItem){
+        System.out.println("====================================================");
+        System.out.println("                   Daftar Pesanan                   ");
+        System.out.println("====================================================");
+        System.out.printf("%-5s %-20s %-10s %-10s%n", "No", "Nama Menu", "Qty", "Harga");
+        System.out.println("====================================================");
+        int nomorUrut=1;
+        for (int i = 0; i < namaMenu.length; i++) {
+            if (jumlahItem[i]>0) {
+                int totalHargaItem=hargaMenu[i]*jumlahItem[i];
+                System.out.printf("%-5d %-20s %-10d Rp %-10d%n", nomorUrut++, namaMenu[i], jumlahItem[i], totalHargaItem);
+            }
+            
+        }
+        System.out.println("====================================================");
+    }
+    
+    //Method melakukan pembayaran
+    static void pembayaran(int totalHarga, int[]jumlahTerjual, int[] hargaMenu, double[]totalPemasukan){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Total harga: Rp"+totalHarga);
+        System.out.print("      uang : Rp");
+        int uangDibayar=scanner.nextInt();
+        
+        if(uangDibayar==totalHarga){
+            System.out.println("Uang pas");
+        }else if(uangDibayar>totalHarga){
+            int kembalian = uangDibayar-totalHarga;
+            System.out.println("Kembalian  : Rp"+kembalian);
+            //update jumlah terjual
+            for (int i = 0; i < jumlahTerjual.length; i++) {
+                if (totalHarga>=hargaMenu[i]) {
+                    jumlahTerjual[i]+= totalHarga/hargaMenu[i];
+                }
+            }
+            //update total pemasukan
+            totalPemasukan[0]+=totalHarga;
+        }else{
+            System.out.println("Uang yang dibayar tidak cukup");
+        }
+        System.out.println("====================================================");
+        System.out.println("===================Terima Kasih=====================");
+    }
+    
+    //Method userAdmin
+    static void menuAdmin(String[] namaMenu, int[] hargaMenu, int[] jumlahTerjual){
+        Scanner scanner=new Scanner(System.in);
+        System.out.print("Masukkan PIN Admin: ");
+        String pinAdmin = scanner.nextLine();
+        if (validasiPINAdmin(pinAdmin)) {
+            // Panggil menu kasir di sini
+        } else {
+            System.out.println("PIN salah. Akses ditolak.");
+        }
+        while (true){
+            System.out.println("== Menu Admin ==");
+            System.out.println("1. Tampilkan Menu");
+            System.out.println("2. Tambah Menu");
+            System.out.println("3. Ubah Menu");
+            System.out.println("4. Hapus Menu");
+            System.out.println("0. kembali ke menu utama");
+            System.out.print("Pilih:");
+            int pilih=scanner.nextInt();
+            
+            switch(pilih){
+                case 1:
+                    tampilkanMenu(namaMenu, hargaMenu);
+                    break;
+                case 2:
+                    System.out.print("Masukkan nama menu baru: ");
+                    scanner.nextLine();
+                    String menuBaru=scanner.nextLine();
+                    System.out.print("Masukkan harga menu baru: ");
+                    int hargaBaru = scanner.nextInt();
+                    
+                    //tambah menu baru
+                    namaMenu=tambahMenu(namaMenu, menuBaru);
+                    hargaMenu=tambahHarga(hargaMenu, hargaBaru);
+                    jumlahTerjual=tambahJumlahTerjual(jumlahTerjual);
+                    System.out.println("== Menu berhasil ditambahkan ==");
+                    break;
+                case 3:
+                    System.out.print("Masukkan nama menu yang ingin diubah: ");
+                    scanner.nextLine();
+                    String menuUbah=scanner.nextLine();
+                    int indexUbah=cariMenu(namaMenu, menuUbah);
+                    if (indexUbah!=-1) {
+                        System.out.print("Masukkan harga baru untuk "+menuUbah+ ": ");
+                        int hargaUbah=scanner.nextInt();
+                        hargaMenu[indexUbah]=hargaUbah;
+                        System.out.println("== Menu berhasil diubah ==");
+                    }else{
+                        System.out.println("Menu tidak ditemukan");
+                    }
+                    break;
+                case 4:
+                    System.out.println("Masukkan nama menu yang ingin dihapus: ");
+                    scanner.nextLine();
+                    String menuHapus=scanner.nextLine();
+                    int indexHapus=cariMenu(namaMenu, menuHapus);
+                    if (indexHapus!=-1) {
+                        namaMenu=hapusMenu(namaMenu, indexHapus);
+                        hargaMenu=hapusHarga(hargaMenu, indexHapus);
+                        jumlahTerjual=hapusJumlahTerjual(jumlahTerjual, indexHapus);
+                        System.out.println("== Menu berhasil dihapus ==");
+                        
+                    }else{
+                        System.out.println("Menu tidak ditemukan");
+                    }
+                    break;
+                case 0:
+                    return;
+                default: System.out.println("pilihan tidak valid");
+            }
+        }
+    }
+    
+    //Method untuk menambah menu
+    static String[] tambahMenu(String[] namaMenu, String menuBaru){
+        String[] newMenu=new String[namaMenu.length+1];
+        System.arraycopy(namaMenu, 0, newMenu, 0, namaMenu.length);
+        newMenu[namaMenu.length]=menuBaru;
+        return newMenu;
+    }
+    
+    //Method untuk menambah harga
+    static int[] tambahHarga(int[] hargaMenu, int hargaBaru){
+        int[] newHarga=new int[hargaMenu.length+1];
+        System.arraycopy(hargaMenu, 0, newHarga, 0, hargaMenu.length);
+        newHarga[hargaMenu.length]=hargaBaru;
+        return newHarga;
+    }
+    
+    //Method untuk mencari menu
+    static int cariMenu(String[] namaMenu, String Menu){
+        for (int i = 0; i < namaMenu.length; i++) {
+            if (namaMenu[i].equalsIgnoreCase(Menu)) {
+                return i;
+                
+            }
+            
+        }
+        return -1;
+    }
+    
+    //Method untuk menghapus menu
+    static String[] hapusMenu(String[] namaMenu, int index){
+        String[] newMenu=new String[namaMenu.length-1];
+        for (int i = 0, j= 0; i < namaMenu.length; i++) {
+            if (i!=index) {
+                newMenu[j++]=namaMenu[i];
+            }
+        }
+        return newMenu;
+    }
+    
+    //Method untuk menghapus harga
+    static int[] hapusHarga(int[] hargaMenu, int index){
+        int[] newHarga=new int[hargaMenu.length-1];
+        for (int i = 0, j=0; i < hargaMenu.length; i++) {
+            if (i!=index) {
+                newHarga[j++]=hargaMenu[i];
+            }
+        }
+        return newHarga;
+    }
+    
+    //Method untuk menambah jumlah terjual
+    static int[] tambahJumlahTerjual(int[] jumlahTerjual){
+        int[] newJumlah = new int[jumlahTerjual.length+1];
+        System.arraycopy(jumlahTerjual, 0, newJumlah, 0, jumlahTerjual.length);
+        newJumlah[jumlahTerjual.length]=0;
+        return newJumlah;
+    }
+    
+    //Method untuk menghapus jumlah terjual
+    static int[] hapusJumlahTerjual(int[] jumlahTerjual, int index){
+        int[] newJumlah = new int[jumlahTerjual.length-1];
+        for (int i = 0, j=0; i < jumlahTerjual.length; i++) {
+            if (i!=index) {
+                newJumlah[j++]=jumlahTerjual[i];
+            }
+        }
+        return newJumlah;
+    }
+    
+    //Method untuk melihat laporan pemasukan
+    static void lihatLaporan(double[] totalPemasukan){
+        
+        System.out.println("Total Pemasukan: Rp "+totalPemasukan[0]);
+    }
+    
+    //Method untuk melihat 5 barang terlaris
+    static void lihatBarangTerlaris(String[] namaMenu, int[] jumlahTerjual){
+       Integer[] indices = new Integer[jumlahTerjual.length];
+        for (int i = 0; i < jumlahTerjual.length; i++) {
+            indices[i] = i;
+        }
+        Arrays.sort(indices, Comparator.comparingInt(i -> -jumlahTerjual[i])); // Urutkan berdasarkan jumlah terjual
+
+        System.out.println("5 Barang Terlaris:");
+        System.out.printf("%-5s %-20s %-10s%n", "No", "Nama Menu", "Jumlah Terjual");
+        System.out.println("==================================");
+        for (int i = 0; i < Math.min(5, indices.length); i++) {
+            int index = indices[i];
+            System.out.printf("%-5d %-20s %-10d%n", (i + 1), namaMenu[index], jumlahTerjual[index]);
+        }
+        System.out.println("==================================");
+        
+    }
+    
+    // Method untuk menu owner
+    public static void menuOwner(String[] namaMenu, int[] hargaMenu, int[] jumlahTerjual, double[] totalPemasukan) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Masukkan PIN Owner: ");
+        String pinOwner = scanner.nextLine();
+        if (validasiPINOwner(pinOwner)) {
+            // Panggil menu kasir di sini
+        } else {
+            System.out.println("PIN salah. Akses ditolak.");
+        }
+        while (true) {
+            
+            System.out.println("== Menu Owner ==");
+            System.out.println("1. Lihat Laporan Pemasukan");
+            System.out.println("2. Lihat 5 Barang Terlaris");
+            System.out.println("0. Kembali ke Menu Utama");
+            System.out.print("Pilih opsi: ");
+            int pilihan = scanner.nextInt();
+
+            switch (pilihan) {
+                case 1:
+                    lihatLaporan(totalPemasukan);
+                    break;
+                case 2:
+                    lihatBarangTerlaris(namaMenu, jumlahTerjual);
+                    break;
+                case 0:
+                    return; // Kembali ke menu utama
+                default:
+                    System.out.println("Pilihan tidak valid.");
+            }
+        }
+    }
+    
+    // Method memvalidasi pin kasir
+    static boolean validasiPINKasir(String pin) {
+        final String PIN_KASIR = "0000";
+        return pin.equals(PIN_KASIR);
+    }
+    
+    // Method memvalidasi pin Admin
+    static boolean validasiPINAdmin(String pin) {
+        final String PIN_ADMIN = "1111";
+        return pin.equals(PIN_ADMIN);
+    }
+    
+    // Method memvalidasi pin Owner
+    static boolean validasiPINOwner(String pin) {
+        final String PIN_OWNER = "2222";
+        return pin.equals(PIN_OWNER);
+    }
+
+
+   
+ 
+    
+    public static void main(String[] args) {
+        Scanner sc= new Scanner(System.in);
+        int pilih = 0;
+        
+        //Array nama dan harga produk
+        String namaMenu[]={"Pecel biasa","Pecel+Telur","Ayam Goreng","Ayam Panggang","Ayam Bumbu Bali","Es jeruk","Teh Hangat","Jeruk Hangat"};
+        int hargaMenu[]={10000,11000,10000,13000,12000,5000,4000,4000};
+        int jumlahTerjual[]={0,0,0,0,0,0,0,0};
+        double[] totalPemasukan={0};
+      
+        do{
+            System.out.println("Pilih mode kasir");
+            System.out.println("1. Kasir");
+            System.out.println("2. Admin");
+            System.out.println("3. Owner");
+            System.out.println("4. Exit");
+            System.out.print("Pilih:");
+            pilih=sc.nextInt();
+            
+            switch(pilih){
+                case 1:
+                    menuKasir(namaMenu,hargaMenu, jumlahTerjual, totalPemasukan);
+                    
+                    break;
+                case 2:
+                    menuAdmin(namaMenu, hargaMenu, jumlahTerjual);
+                    break;
+                case 3:
+                    menuOwner(namaMenu, hargaMenu, jumlahTerjual, totalPemasukan);
+                    break;
+                case 4:
+                    System.out.println("================Terima Kasih==============");
+                    break;
+                default: System.out.println("Pilihan anda tidak valid!");
+                
+            }
+        }while(pilih!=4);
+        
+    }
+}
